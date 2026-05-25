@@ -1,0 +1,42 @@
+[
+  {
+    "department": "IT",
+    "fullName": "John Doe",
+    "amount": 50000
+  },
+  {
+    "department": "HR",
+    "fullName": "Jane Smith",
+    "amount": 60000
+  },
+  {
+    "department": "Finance",
+    "fullName": "Bob Johnson",
+    "amount": 70000
+  },
+  {
+    "department": "IT",
+    "fullName": "Alice Johnson",
+    "amount": 55000
+  },
+  {
+    "department": "Sales",
+    "fullName": "Michael Brown",
+    "amount": 62000
+  },
+  {
+    "department": "IT",
+    "fullName": "Emily Davis",
+    "amount": 68000
+  },
+  {
+    "department": "Legal",
+    "fullName": "David Miller",
+    "amount": 75000
+  },
+  {
+    "department": "Sales",
+    "fullName": "Samantha Wilson",
+    "amount": 58000
+  }
+]

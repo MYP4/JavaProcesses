@@ -1,17 +1,12 @@
 package accounting;
 
-//import exceptions.InvalidDataException;
+import exceptions.InvalidDataException;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-
-//1. Распечатать ведомости по отделам
-//2. Найти отдел с самой высокой средней заработной платой
-//3. Найти отдел с самой большой общей суммой выплаты
 
 @Data
 public class Accounting {

@@ -2,6 +2,7 @@ package common;
 
 import accounting.SalaryRecord;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import exceptions.InvalidDataException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,7 +17,7 @@ public class FileProvider implements JsonReader, JsonWriter {
     public FileProvider() {}
 
     @Override
-    public List<SalaryRecord> readFile(Path fileName) throws Exception {
+    public List<SalaryRecord> readFile(Path fileName) throws InvalidDataException {
         logger.info("Starting the data reading process");
         try {
             logger.info("Reading data");
@@ -26,12 +27,12 @@ public class FileProvider implements JsonReader, JsonWriter {
 
         } catch (IOException e) {
             logger.severe("\"Error parsing data from file\"" + e.getMessage());
-            throw new Exception(e.getMessage());
+            throw new InvalidDataException(e.getMessage());
         }
     }
 
     @Override
     public void writeToFile(List<SalaryRecord> collection, Path fileName) {
-
+        // В данной задаче реализация не важна
     }
 }

@@ -1,27 +1,16 @@
 import accounting.Accounting;
 import providers.FileProvider;
 
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-/*
-Дан файл, содержащий сведения о заработной плате сотрудников предприятия в формате:
-Номер отдела;ФИО;Сумма
-Необходимо написать программу, которая позволит:
-1. Распечатать ведомости по отделам
-2. Найти отдел с самой высокой средней заработной платой
-3. Найти отдел с самой большой общей суммой выплаты
-В задаче должны использоваться элементы функционального программирования
-Задача должна быть представлена в виде maven-проекта
-Задача должна быть покрыта тестами с помощью JUnit
-*/
+import java.util.logging.Logger;
 
 public class Main {
     private static final String FILE_NAME = "salary_records.json";
-    private static final Logger logger = LogManager.getLogger(FileProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         logger.info("The beginning of the demonstration work");
@@ -32,16 +21,12 @@ public class Main {
         logger.info("Created \"FileProvider\"");
 
         try {
-            var path = Paths.get(Objects.requireNonNull(Main.class.getResource(FILE_NAME)).toURI());
-            logger.info("Created path to file");
+            // Изменение только здесь - создаем временный файл из ресурса
+            Path tempPath = createTempFileFromResource(FILE_NAME);
+            logger.info("Created temp file: " + tempPath);
 
-            try {
-                var records = fileProvider.readFile(path);
-                accounting.setSalaryRecords(records);
-
-            } catch (Exception ex) {
-                logger.fatal(ex.getMessage());
-            }
+            var records = fileProvider.readFile(tempPath);
+            accounting.setSalaryRecords(records);
 
             logger.info("Demonstration of how the methods work");
 
@@ -51,10 +36,24 @@ public class Main {
             logger.info("Department with highest average salary is " + averageSalary);
 
             var totalSalary = accounting.findDepartmentWithHighestTotalPayout();
-            logger.info("Department with highest highest total payout is " + totalSalary);
+            logger.info("Department with highest total payout is " + totalSalary);
 
         } catch (Exception e) {
-            logger.fatal(e.getMessage());
+            logger.severe(e.getMessage());
+        }
+    }
+
+    private static Path createTempFileFromResource(String resourceName) throws Exception {
+        try (InputStream inputStream = Main.class.getResourceAsStream("/" + resourceName)) {
+            if (inputStream == null) {
+                throw new Exception("Resource not found: " + resourceName);
+            }
+
+            Path tempFile = Files.createTempFile("salary_", ".tmp");
+            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            tempFile.toFile().deleteOnExit();
+
+            return tempFile;
         }
     }
 }

@@ -1,4 +1,4 @@
-package common;
+package providers;
 
 import accounting.SalaryRecord;
 

@@ -1,6 +1,5 @@
 package accounting;
 
-import exceptions.InvalidDataException;
 import lombok.Data;
 
 import java.util.List;

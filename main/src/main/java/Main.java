@@ -1,9 +1,11 @@
 import accounting.Accounting;
-import common.FileProvider;
+import providers.FileProvider;
 
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /*
 Дан файл, содержащий сведения о заработной плате сотрудников предприятия в формате:
@@ -19,7 +21,7 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final String FILE_NAME = "salary_records.json";
-    private static final Logger logger = Logger.getLogger(FileProvider.class.getName());
+    private static final Logger logger = LogManager.getLogger(FileProvider.class.getName());
 
     public static void main(String[] args) {
         logger.info("The beginning of the demonstration work");
@@ -38,7 +40,7 @@ public class Main {
                 accounting.setSalaryRecords(records);
 
             } catch (Exception ex) {
-                logger.severe(ex.getMessage());
+                logger.fatal(ex.getMessage());
             }
 
             logger.info("Demonstration of how the methods work");
@@ -52,7 +54,7 @@ public class Main {
             logger.info("Department with highest highest total payout is " + totalSalary);
 
         } catch (Exception e) {
-            logger.severe(e.getMessage());
+            logger.fatal(e.getMessage());
         }
     }
 }

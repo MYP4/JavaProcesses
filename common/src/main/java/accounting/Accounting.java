@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class Accounting {
-    private static final Logger logger = Logger.getLogger(Accounting.class.getName());
+    private static Logger logger = Logger.getLogger(Accounting.class.getName());
     private List<SalaryRecord> salaryRecords;
 
     public Accounting() {
@@ -18,7 +18,6 @@ public class Accounting {
     public Accounting(List<SalaryRecord> salaryRecords) {
         this.salaryRecords = salaryRecords;
     }
-
 
     public Map<String, List<SalaryRecord>> groupTheRecordsByDepartments(){
         logger.info("The method \"groupTheRecordsByDepartments\" has started working");

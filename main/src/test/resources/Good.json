@@ -1,0 +1,17 @@
+[
+  {
+    "department": "IT",
+    "fullName": "John Doe",
+    "amount": 50000
+  },
+  {
+    "department": "HR",
+    "fullName": "Jane Smith",
+    "amount": 60000
+  },
+  {
+    "department": "Finance",
+    "fullName": "Bob Johnson",
+    "amount": 70000
+  }
+]

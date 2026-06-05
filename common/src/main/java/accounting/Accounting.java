@@ -1,26 +1,48 @@
 package accounting;
 
 import lombok.Data;
-
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Provides accounting operations for salary records including grouping,
+ * calculating average salaries, and total payouts by department.
+ */
 @Data
-public class Accounting {
-    private static Logger logger = Logger.getLogger(Accounting.class.getName());
+public final class Accounting {
+    /** Logger for the Accounting class. */
+    private static final Logger LOGGER =
+            Logger.getLogger(Accounting.class.getName());
+
+    /** List of salary records. */
     private List<SalaryRecord> salaryRecords;
 
+    /**
+     * Default constructor.
+     */
     public Accounting() {
     }
 
-    public Accounting(List<SalaryRecord> salaryRecords) {
-        this.salaryRecords = salaryRecords;
+    /**
+     * Constructs an Accounting instance with the specified salary records.
+     *
+     * @param records the list of salary records to be processed
+     */
+    public Accounting(final List<SalaryRecord> records) {
+        this.salaryRecords = records;
     }
 
-    public Map<String, List<SalaryRecord>> groupTheRecordsByDepartments(){
-        logger.info("The method \"groupTheRecordsByDepartments\" has started working");
+    /**
+     * Groups salary records by department.
+     *
+     * @return a map where the key is department name and the value is
+     *         a list of salary records belonging to that department
+     */
+    public Map<String, List<SalaryRecord>> groupTheRecordsByDepartments() {
+        LOGGER.info("The method \"groupTheRecordsByDepartments\" "
+                + "has started working");
 
         return salaryRecords.stream()
                 .collect(Collectors.groupingBy(
@@ -28,8 +50,15 @@ public class Accounting {
                 ));
     }
 
+    /**
+     * Finds the department with the highest average salary.
+     *
+     * @return the name of the department with the highest average salary,
+     *         or null if no records exist
+     */
     public String findDepartmentWithHighestAverageSalary() {
-        logger.info("The method \"findDepartmentWithHighestAverageSalary\" has started working");
+        LOGGER.info("The method \"findDepartmentWithHighestAverageSalary\""
+                + " has started working");
 
         return salaryRecords.stream()
                 .collect(Collectors.groupingBy(
@@ -42,8 +71,15 @@ public class Accounting {
                 .orElse(null);
     }
 
+    /**
+     * Finds the department with the highest total payout.
+     *
+     * @return the name of the department with the highest total salary payout,
+     *         or null if no records exist
+     */
     public String findDepartmentWithHighestTotalPayout() {
-        logger.info("The method \"findDepartmentWithHighestTotalPayout\" has started working");
+        LOGGER.info("The method \"findDepartmentWithHighestTotalPayout\""
+                + " has started working");
 
         return salaryRecords.stream()
                 .collect(Collectors.groupingBy(

@@ -10,35 +10,69 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class FileProvider implements JsonReader, JsonWriter {
-    private static final Logger logger = Logger.getLogger(FileProvider.class.getName());
-    private ObjectMapper mapper = new ObjectMapper();
+/**
+ * Provides file operations for reading and
+ * writing salary records to JSON files.
+ */
+public final class FileProvider implements JsonReader, JsonWriter {
+    /** Logger for the FileProvider class. */
+    private static final Logger LOGGER =
+            Logger.getLogger(FileProvider.class.getName());
 
-    public FileProvider(ObjectMapper mapper) {
-        this.mapper = mapper;
+    /** Object mapper for JSON serialization/deserialization. */
+    private final ObjectMapper objectMapper;
+
+    /**
+     * Constructs a FileProvider with the specified object mapper.
+     *
+     * @param mapper the ObjectMapper to use for JSON processing
+     */
+    public FileProvider(final ObjectMapper mapper) {
+        this.objectMapper = mapper;
     }
 
+    /**
+     * Default constructor that creates a default ObjectMapper.
+     */
     public FileProvider() {
-        this.mapper = new ObjectMapper();
+        this.objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Reads salary records from a JSON file.
+     *
+     * @param fileName the path to the file to read
+     * @return a list of SalaryRecord objects
+     * @throws InvalidDataException
+     * if an I/O error occurs or data is invalid
+     */
     @Override
-    public List<SalaryRecord> readFile(Path fileName) throws InvalidDataException {
-        logger.info("Starting the data reading process");
+    public List<SalaryRecord> readFile(final Path fileName)
+            throws InvalidDataException {
+        LOGGER.info("Starting the data reading process");
         try {
-            logger.info("Reading data");
-            SalaryRecord[] records = mapper.readValue(fileName.toFile(), SalaryRecord[].class);
-            logger.info("The data has been read");
+            LOGGER.info("Reading data");
+            SalaryRecord[] records = objectMapper.readValue(
+                    fileName.toFile(), SalaryRecord[].class);
+            LOGGER.info("The data has been read");
             return Arrays.asList(records);
 
         } catch (IOException e) {
-            logger.severe("\"Error parsing data from file\"" + e.getMessage());
+            LOGGER.severe("Error parsing data from file: "
+                    + e.getMessage());
             throw new InvalidDataException(e.getMessage());
         }
     }
 
+    /**
+     * Writes salary records to a JSON file.
+     *
+     * @param collection the list of salary records to write
+     * @param fileName the path to the file to write to
+     */
     @Override
-    public void writeToFile(List<SalaryRecord> collection, Path fileName) {
-        // В данной задаче реализация не важна
+    public void writeToFile(final List<SalaryRecord> collection,
+                            final Path fileName) {
+        // In this task, implementation is not important
     }
 }

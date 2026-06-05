@@ -3,6 +3,11 @@ pipeline {
     tools {
         maven 'maven-3.9.16'
     }
+    environment {
+        JACOCO_CSV_PATH = 'aggregator/target/site/jacoco-aggregate/jacoco.csv'
+        THRESHOLD_COVERAGE = '60'
+        ARTIFACT_DIR = 'D:\\Practice\\archive'
+    }
     stages {
         stage('Checkout') {
             steps {

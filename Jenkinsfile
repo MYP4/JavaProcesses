@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     def coverage = calculateCoverage()
-                    def threshold = 60
+                    def threshold = THRESHOLD_COVERAGE.toInteger()
 
                     echo """
                     ╔══════════════════════════════════════════════════╗

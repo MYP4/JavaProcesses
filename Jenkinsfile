@@ -44,12 +44,50 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    def file = readFile('aggregator/target/site/jacoco-aggregate/index.html')
-                    def regexMatch = file =~ "<td class=\"ctr2\">(\\d+)%</td>"
-                    def coverage = regexMatch[0][1] as int
-                    if (coverage < 60) {
-                        error "Quality Gate Failed"
+                    sh 'mvn jacoco:report'
+
+                    def reportPath = 'aggregator/target/site/jacoco-aggregate/index.html'
+
+                    if (!fileExists(reportPath)) {
+                        error "Coverage report not found at ${reportPath}"
                     }
+
+                    def html = readFile(reportPath)
+
+                    def lineCoveragePattern = /<td>Line<\/td>[\s\S]*?<td class="ctr2">(\d+)%/
+                    def matcher = (html =~ lineCoveragePattern)
+
+                    if (!matcher.find()) {
+                        def altPattern = /ctr2[^>]*>(\d+)%/
+                        matcher = (html =~ altPattern)
+                        if (!matcher.find()) {
+                            error "Cannot parse coverage from HTML"
+                        }
+                    }
+
+                    def coveragePercent = matcher[0][1] as int
+
+                    def classCoveragePattern = /Total[^<]*<td class="ctr2">(\d+)%/
+                    matcher = (html =~ classCoveragePattern)
+                    def classCoverage = matcher.find() ? matcher[0][1] as int : coveragePercent
+
+                    echo """
+                    ====================================
+                    Quality Gate Results:
+                    - Line Coverage: ${coveragePercent}%
+                    - Class Coverage: ${classCoverage}%
+                    Threshold: 60%
+                    ====================================
+                    """
+
+                    if (coveragePercent < 60) {
+                        error "❌ Quality Gate FAILED: Coverage ${coveragePercent}% < 60%"
+                    } else {
+                        echo "✅ Quality Gate PASSED: Coverage ${coveragePercent}% >= 60%"
+                    }
+
+                    writeFile file: 'coverage-result.txt', text: "Coverage: ${coveragePercent}%"
+                    archiveArtifacts 'coverage-result.txt'
                 }
             }
         }

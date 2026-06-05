@@ -84,7 +84,7 @@ pipeline {
         stage("Assembly"){
             steps{
                 echo "Saving jar in Artifacts and External Directory"
-                bat "copy aggregator\\target\\*.jar D:\\jar\\"
+                bat "copy aggregator\\target\\*.jar D:\\Practice\\archive"
             }
             post {
                 always{

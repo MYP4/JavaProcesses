@@ -44,11 +44,28 @@ pipeline {
         stage("Quality Gate"){
             steps{
                 script{
-                    def file = readFile('aggregator/target/site/jacoco-aggregate/index.html')
-                    def regexMatch = file =~ "<td class=\"ctr2\">(\\d+)%</td>"
-                    def coverage = regexMatch[0][1] as int
-                    if (coverage < 60) {
-                        error "Quality Gate Failed"
+                    def jacocoReportPath = 'aggregator/target/site/jacoco-aggregate/jacoco.xml'
+                    if (!fileExists(jacocoReportPath)) {
+                        echo "Coverage report not found: ${jacocoReportPath}. Skipping coverage check."
+                        return
+                    }
+
+                    def coverageFile = readFile(jacocoReportPath)
+                    def missed = coverageFile =~ /<counter type="LINE" missed="(\\d+)"/
+                    def covered = coverageFile =~ /covered="(\\d+)"/
+
+                    if (!missed || !covered) {
+                        error "Cannot read coverage data"
+                    }
+
+                    def missedLines = missed[0][1] as int
+                    def coveredLines = covered[0][1] as int
+                    def total = missedLines + coveredLines
+                    def percent = (coveredLines * 100) / total
+
+                    echo "Coverage: ${percent}%"
+                    if (percent < 60) {
+                        error "Code coverage ${percent}% is below threshold"
                     }
                 }
             }

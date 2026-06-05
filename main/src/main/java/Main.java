@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public class Main {
@@ -21,8 +20,7 @@ public class Main {
         logger.info("Created \"FileProvider\"");
 
         try {
-            // Изменение только здесь - создаем временный файл из ресурса
-            Path tempPath = createTempFileFromResource(FILE_NAME);
+            Path tempPath = createTempFileFromResource();
             logger.info("Created temp file: " + tempPath);
 
             var records = fileProvider.readFile(tempPath);
@@ -43,10 +41,10 @@ public class Main {
         }
     }
 
-    private static Path createTempFileFromResource(String resourceName) throws Exception {
-        try (InputStream inputStream = Main.class.getResourceAsStream("/" + resourceName)) {
+    private static Path createTempFileFromResource() throws Exception {
+        try (InputStream inputStream = Main.class.getResourceAsStream("/" + Main.FILE_NAME)) {
             if (inputStream == null) {
-                throw new Exception("Resource not found: " + resourceName);
+                throw new Exception("Resource not found: " + Main.FILE_NAME);
             }
 
             Path tempFile = Files.createTempFile("salary_", ".tmp");

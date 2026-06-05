@@ -12,9 +12,15 @@ import java.util.logging.Logger;
 
 public class FileProvider implements JsonReader, JsonWriter {
     private static final Logger logger = Logger.getLogger(FileProvider.class.getName());
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
-    public FileProvider() {}
+    public FileProvider(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    public FileProvider() {
+        this.mapper = new ObjectMapper();
+    }
 
     @Override
     public List<SalaryRecord> readFile(Path fileName) throws InvalidDataException {

@@ -32,7 +32,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts "aggregator/target/site/**"
+                    archiveArtifacts "aggregator/target/site/jacoco-aggregate/**"
                 }
             }
         }
@@ -41,14 +41,42 @@ pipeline {
                 bat 'mvn install'
             }
         }
-        stage("Quality Gate"){
-            steps{
-                script{
-                    def file = readFile('aggregator/target/site/jacoco-aggregate/index.html')
-                    def regexMatch = file =~ "<td class=\"ctr2\">(\\d+)%</td>"
-                    def coverage = regexMatch[0][1] as int
-                    if (coverage < 60) {
-                        error "Quality Gate Failed"
+        stage("Quality Gate") {
+            steps {
+                script {
+                    def csvFile = 'aggregator/target/site/jacoco-aggregate/jacoco.csv'
+
+                    if (!fileExists(csvFile)) {
+                        error "JaCoCo CSV report not found at: ${csvFile}"
+                    }
+
+                    def csvContent = readFile(csvFile)
+                    def lines = csvContent.split('\n')
+
+                    // Суммируем покрытие инструкций по всем строкам
+                    def totalCovered = 0
+                    def totalMissed = 0
+
+                    lines[1..-1].each { line ->
+                        if (line.trim().length() > 0) {
+                            def columns = line.split(',')
+                            if (columns.size() >= 5) {
+                                totalMissed += columns[3].toInteger()      // INSTRUCTION_MISSED
+                                totalCovered += columns[4].toInteger()     // INSTRUCTION_COVERED
+                            }
+                        }
+                    }
+
+                    def total = totalCovered + totalMissed
+                    def coverage = total > 0 ? (totalCovered * 100 / total) : 0
+
+                    echo "Total Instructions Coverage: ${coverage}% (${totalCovered}/${total})"
+
+                    def threshold = 60
+                    if (coverage < threshold) {
+                        error "Quality Gate Failed: Instruction coverage ${coverage}% < ${threshold}%"
+                    } else {
+                        echo "✅ Quality Gate Passed: ${coverage}% >= ${threshold}%"
                     }
                 }
             }
@@ -56,7 +84,7 @@ pipeline {
         stage("Assembly"){
             steps{
                 echo "Saving jar in Artifacts and External Directory"
-                bat "copy aggregator\\target\\*.jar D:\\jar\\"
+                bat "copy aggregator\\target\\*.jar D:\\Practice\\archive"
             }
             post {
                 always{

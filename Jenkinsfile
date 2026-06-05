@@ -41,31 +41,31 @@ pipeline {
                 bat 'mvn install'
             }
         }
-        stage("Quality Gate"){
-            steps{
-                script{
-                    def jacocoReportPath = 'aggregator/target/site/jacoco-aggregate/jacoco.xml'
-                    if (!fileExists(jacocoReportPath)) {
-                        echo "Coverage report not found: ${jacocoReportPath}. Skipping coverage check."
-                        return
+        stage("Quality Gate") {
+            steps {
+                script {
+                    def jacocoHtmlPath = 'aggregator/target/site/jacoco-aggregate/index.html'
+
+                    if (!fileExists(jacocoHtmlPath)) {
+                        error "Coverage report not found: ${jacocoHtmlPath}"
                     }
 
-                    def coverageFile = readFile(jacocoReportPath)
-                    def missed = coverageFile =~ /<counter type="LINE" missed="(\\d+)"/
-                    def covered = coverageFile =~ /covered="(\\d+)"/
+                    def htmlContent = readFile(jacocoHtmlPath)
 
-                    if (!missed || !covered) {
-                        error "Cannot read coverage data"
+                    // В HTML обычно есть строка: <tfoot><tr><td>Total</td><td class="ctr2">...</td>
+                    def coveragePattern = /Total[^<]*<td class="ctr2">(\\d+)%/
+                    def matcher = (htmlContent =~ coveragePattern)
+
+                    if (!matcher.find()) {
+                        error "Cannot find coverage percentage in HTML report"
                     }
 
-                    def missedLines = missed[0][1] as int
-                    def coveredLines = covered[0][1] as int
-                    def total = missedLines + coveredLines
-                    def percent = (coveredLines * 100) / total
+                    def coveragePercent = matcher[0][1] as int
 
-                    echo "Coverage: ${percent}%"
-                    if (percent < 60) {
-                        error "Code coverage ${percent}% is below threshold"
+                    echo "Code Coverage: ${coveragePercent}%"
+
+                    if (coveragePercent < 60) {
+                        error "Code coverage ${coveragePercent}% is below 60% threshold"
                     }
                 }
             }

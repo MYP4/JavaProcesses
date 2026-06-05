@@ -44,8 +44,6 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    sh 'mvn jacoco:report'
-
                     def reportPath = 'aggregator/target/site/jacoco-aggregate/index.html'
 
                     if (!fileExists(reportPath)) {

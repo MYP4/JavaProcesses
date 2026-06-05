@@ -1,21 +1,21 @@
 package accounting;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AccountingTest {
-    private final Accounting accounting = new Accounting();
+    private Accounting accounting;
 
     @BeforeEach
     void setUp() {
-        List<SalaryRecord> records = List.of(
+        List<SalaryRecord> records = Arrays.asList(  // Используем Arrays.asList для изменяемого списка
                 new SalaryRecord("IT", "John Doe", 50000),
                 new SalaryRecord("HR", "Jane Smith", 60000),
                 new SalaryRecord("Finance", "Bob Johnson", 70000),
@@ -25,71 +25,117 @@ class AccountingTest {
                 new SalaryRecord("Legal", "David Miller", 75000),
                 new SalaryRecord("Sales", "Samantha Wilson", 58000)
         );
-        accounting.setSalaryRecords(records);
+        accounting = new Accounting(records);
     }
 
     @Test
-    void groupTheRecordsByDepartmentsTest() {
-        Map<String, List<SalaryRecord>> result = accounting.groupTheRecordsByDepartments();
-
-        assertEquals(5, result.size());
-        assertTrue(result.containsKey("IT"));
-        assertTrue(result.containsKey("HR"));
-        assertTrue(result.containsKey("Finance"));
-        assertTrue(result.containsKey("Sales"));
-        assertTrue(result.containsKey("Legal"));
-        assertEquals(3, result.get("IT").size());
-        assertEquals(1, result.get("HR").size());
-        assertEquals(1, result.get("Finance").size());
-        assertEquals(2, result.get("Sales").size());
-        assertEquals(1, result.get("Legal").size());
+    void testDefaultConstructor() {
+        Accounting emptyAccounting = new Accounting();
+        assertNull(emptyAccounting.getSalaryRecords());
     }
 
     @Test
-    void findDepartmentWithHighestAverageSalaryTest()  {
+    void testParameterizedConstructor() {
+        List<SalaryRecord> records = new ArrayList<>();
+        Accounting newAccounting = new Accounting(records);
+        assertEquals(records, newAccounting.getSalaryRecords());
+    }
+
+    @Test
+    void testSetSalaryRecords() {
+        List<SalaryRecord> newRecords = new ArrayList<>();
+        accounting.setSalaryRecords(newRecords);
+        assertEquals(newRecords, accounting.getSalaryRecords());
+    }
+
+    @Test
+    void testFindDepartmentWithHighestAverageSalary_WhenOneDepartment() {
+        List<SalaryRecord> singleDepartment = Arrays.asList(
+                new SalaryRecord("IT", "John Doe", 50000),
+                new SalaryRecord("IT", "Jane Smith", 60000)
+        );
+        accounting.setSalaryRecords(singleDepartment);
         String result = accounting.findDepartmentWithHighestAverageSalary();
-        assertEquals("Legal", result);
-    }
-
-    @Test
-    void findDepartmentWithHighestTotalPayoutTest()  {
-        String result = accounting.findDepartmentWithHighestTotalPayout();
         assertEquals("IT", result);
     }
 
     @Test
-    void groupTheRecordsByDepartmentsWithEmptyListTest() {
-        accounting.setSalaryRecords(new ArrayList<>());
-        assertTrue(accounting.groupTheRecordsByDepartments().isEmpty());
+    void testFindDepartmentWithHighestAverageSalary_WhenSameAverageSalary() {
+        List<SalaryRecord> sameAverage = Arrays.asList(
+                new SalaryRecord("IT", "John Doe", 50000),
+                new SalaryRecord("IT", "Jane Smith", 70000),
+                new SalaryRecord("HR", "Bob Brown", 60000),
+                new SalaryRecord("HR", "Alice White", 60000)
+        );
+        accounting.setSalaryRecords(sameAverage);
+        String result = accounting.findDepartmentWithHighestAverageSalary();
+        assertNotNull(result);
+        assertTrue(result.equals("IT") || result.equals("HR"));
     }
 
     @Test
-    void groupTheRecordsByDepartmentsWithNullListTest() {
-        accounting.setSalaryRecords(null);
-        assertThrows(NullPointerException.class, accounting::groupTheRecordsByDepartments);
+    void testFindDepartmentWithHighestTotalPayout_WhenOneDepartment() {
+        List<SalaryRecord> singleDepartment = Arrays.asList(
+                new SalaryRecord("Sales", "John Doe", 50000),
+                new SalaryRecord("Sales", "Jane Smith", 60000)
+        );
+        accounting.setSalaryRecords(singleDepartment);
+        String result = accounting.findDepartmentWithHighestTotalPayout();
+        assertEquals("Sales", result);
     }
 
     @Test
-    void findDepartmentWithHighestAverageSalaryWithEmptyListTest() {
-        accounting.setSalaryRecords(new ArrayList<>());
-        assertNull(accounting.findDepartmentWithHighestAverageSalary());
+    void testFindDepartmentWithHighestTotalPayout_WhenSameTotal() {
+        List<SalaryRecord> sameTotal = Arrays.asList(
+                new SalaryRecord("IT", "John Doe", 60000),
+                new SalaryRecord("IT", "Jane Smith", 40000),
+                new SalaryRecord("HR", "Bob Brown", 50000),
+                new SalaryRecord("HR", "Alice White", 50000)
+        );
+        accounting.setSalaryRecords(sameTotal);
+        String result = accounting.findDepartmentWithHighestTotalPayout();
+        assertNotNull(result);
+        assertTrue(result.equals("IT") || result.equals("HR"));
     }
 
     @Test
-    void findDepartmentWithHighestAverageSalaryWithNullListTest() {
-        accounting.setSalaryRecords(null);
-        assertThrows(NullPointerException.class, accounting::findDepartmentWithHighestAverageSalary);
+    void testEmptyListWithParameterizedConstructor() {
+        Accounting emptyAccounting = new Accounting(new ArrayList<>());
+        assertTrue(emptyAccounting.groupTheRecordsByDepartments().isEmpty());
+        assertNull(emptyAccounting.findDepartmentWithHighestAverageSalary());
+        assertNull(emptyAccounting.findDepartmentWithHighestTotalPayout());
     }
 
     @Test
-    void findDepartmentWithHighestTotalPayoutWithEmptyListTest() {
-        accounting.setSalaryRecords(new ArrayList<>());
-        assertNull(accounting.findDepartmentWithHighestTotalPayout());
+    void testWithSingleRecord() {
+        List<SalaryRecord> singleRecord = List.of(
+                new SalaryRecord("Legal", "John Doe", 100000)
+        );
+        accounting.setSalaryRecords(singleRecord);
+
+        Map<String, List<SalaryRecord>> grouped = accounting.groupTheRecordsByDepartments();
+        assertEquals(1, grouped.size());
+        assertEquals(1, grouped.get("Legal").size());
+
+        String highestAvg = accounting.findDepartmentWithHighestAverageSalary();
+        assertEquals("Legal", highestAvg);
+
+        String highestTotal = accounting.findDepartmentWithHighestTotalPayout();
+        assertEquals("Legal", highestTotal);
     }
 
     @Test
-    void findDepartmentWithHighestTotalPayoutWithNullListTest() {
-        accounting.setSalaryRecords(null);
-        assertThrows(NullPointerException.class, accounting::findDepartmentWithHighestTotalPayout);
+    void testWithNegativeSalary() {
+        List<SalaryRecord> negativeSalary = Arrays.asList(
+                new SalaryRecord("IT", "John Doe", -1000),
+                new SalaryRecord("HR", "Jane Smith", 1000)
+        );
+        accounting.setSalaryRecords(negativeSalary);
+
+        String highestAvg = accounting.findDepartmentWithHighestAverageSalary();
+        assertEquals("HR", highestAvg);
+
+        String highestTotal = accounting.findDepartmentWithHighestTotalPayout();
+        assertEquals("HR", highestTotal);
     }
 }

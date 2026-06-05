@@ -15,21 +15,13 @@ pipeline {
             }
         }
         stage('Test Feature') {
-            when {
-                expression {
-                    env.GIT_BRANCH ==~ /.*feature.*/
-                }
-            }
+            when { expression {env.GIT_BRANCH =~ '/(feature)/'}}
             steps{
                 bat 'mvn test'
             }
         }
         stage("Checkstyle Develop") {
-            when {
-                expression {
-                    env.GIT_BRANCH == 'develop'
-                }
-            }
+            when { expression {env.GIT_BRANCH =~ '/(develop)/'}}
             steps{
                 bat 'mvn checkstyle:check'
             }

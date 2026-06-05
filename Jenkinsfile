@@ -14,16 +14,16 @@ pipeline {
                 bat 'mvn clean compile'
             }
         }
-        stage('Test Feature') {
-            when { expression {env.GIT_BRANCH =~ '/(feature)/'}}
-            steps{
-                bat 'mvn test'
-            }
-        }
         stage("Checkstyle Develop") {
             when { expression {env.GIT_BRANCH =~ '/(develop)/'}}
             steps{
                 bat 'mvn checkstyle:check'
+            }
+        }
+        stage('Test Feature') {
+            when { expression {env.GIT_BRANCH =~ '/(feature)/'}}
+            steps{
+                bat 'mvn test'
             }
         }
         stage("Test Coverage") {

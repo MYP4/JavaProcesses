@@ -14,6 +14,11 @@ pipeline {
                 bat 'mvn clean compile'
             }
         }
+        stage('Debug env'){
+            steps {
+                echo env.GIT_BRANCH
+            }
+        }
         stage("Checkstyle Develop") {
             when { expression {env.GIT_BRANCH =~ '/(develop)/'}}
             steps{

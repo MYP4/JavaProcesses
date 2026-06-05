@@ -23,10 +23,10 @@ import static org.mockito.Mockito.*;
 class FileProviderMockitoTest {
 
     @Mock
-    private ObjectMapper objectMapper;  // Мокаем ObjectMapper
+    private ObjectMapper objectMapper;
 
     @InjectMocks
-    private FileProvider fileProvider;  // Внедряем мок в FileProvider
+    private FileProvider fileProvider;
 
     private Path testPath;
     private File testFile;

@@ -95,25 +95,15 @@ pipeline {
                 }
             }
         }
-        stage('Assembly & Archive') {
-            steps {
-                script {
-                    bat "if not exist ${ARTIFACT_DIR} mkdir ${ARTIFACT_DIR}"
-
-                    def jarFiles = findFiles(glob: 'aggregator/target/*.jar')
-                    jarFiles.each { file ->
-                        bat "copy \"${file.path}\" ${ARTIFACT_DIR}"
-                        echo "Copied: ${file.name}"
-                    }
-
-                    echo '✅ Artifacts saved to external directory'
-                }
+        stage("Assembly & Archive"){
+            steps{
+                echo "Saving jar in Artifacts and External Directory"
+                bat "copy aggregator\\target\\*.jar D:\\Practice\\archive"
+                echo '✅ Artifacts saved to external directory'
             }
             post {
-                always {
-                    archiveArtifacts artifacts: "aggregator/target/*.jar",
-                                     fingerprint: true
-                    echo 'JAR artifacts archived in Jenkins'
+                always{
+                    archiveArtifacts "aggregator/target/*.jar"
                 }
             }
         }

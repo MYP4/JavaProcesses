@@ -44,33 +44,14 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    def reportPath = 'aggregator/target/site/jacoco-aggregate/index.html'
-
-                    if (!fileExists(reportPath)) {
-                        error "Coverage report not found at ${reportPath}"
-                    }
-
-                    def file = readFile(reportPath)
-
-                    def regexMatch = file =~ /<tfoot>.*?<td class="ctr2">(\d+)%/
-
-                    if (!regexMatch.find()) {
-                        error "Could not find coverage data in HTML report"
-                    }
-
+                    def file = readFile('aggregator/target/site/jacoco-aggregate/index.html')
+                    def regexMatch = file =~ "<td class=\"ctr2\">(\\d+)%</td>"
+                    echo regexMatch
+                    echo regexMatch[0]
+                    echo regexMatch[1]
                     def coverage = regexMatch[0][1] as int
-
-                    echo "========================================"
-                    echo "JaCoCo Coverage Report"
-                    echo "========================================"
-                    echo "Total Instruction Coverage: ${coverage}%"
-                    echo "Threshold: 60%"
-                    echo "========================================"
-
                     if (coverage < 60) {
-                        error "❌ Quality Gate FAILED: Coverage ${coverage}% < 60%"
-                    } else {
-                        echo "✅ Quality Gate PASSED: Coverage ${coverage}% >= 60%"
+                        error "Quality Gate Failed"
                     }
                 }
             }

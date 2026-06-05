@@ -32,7 +32,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts "aggregator/target/site/**"
+                    archiveArtifacts "aggregator/target/site/jacoco-aggregate/**"
                 }
             }
         }
